@@ -1,10 +1,86 @@
-from flask import Flask
+from flask import Flask, request, jsonify, send_from_directory, render_template
+from bs4 import BeautifulSoup
+import urllib.request
+import datetime
+import MeCab
+import re
+import csv
+from json import dumps
 
 app = Flask(__name__)
 
-@app.route('/')
-def hello():
-    return "Hello, Render and Flask!"
+# 静的ファイルの提供
+@app.route('/file/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
+
+# ログインページ（GETリクエスト）
+@app.route('/login', methods=['GET'])
+def login():
+    return '''
+        <form action="/getScore" method="post">
+            <p>Your Review:<br>
+            <textarea name="rev" rows="4" cols="40"></textarea>
+            </p>
+            <p>
+            <input type="submit" value="送信"><input type="reset" value="リセット">
+            </p>
+        </form>
+    '''
+
+# スコアを計算するエンドポイント（POSTリクエスト）
+@app.route('/getScore', methods=['POST'])
+def get_score():
+    lotionDict = []
+    testSentence = request.form['rev']
+
+    # 辞書ファイルの読み込み
+    with open('lotiondic0712.csv', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            inputArray = [row[0], row[1], row[2], row[3], row[4], row[5]]
+            lotionDict.append(inputArray)
+
+    # MeCabを使った形態素解析
+    m = MeCab.Tagger()
+    s1 = m.parse(testSentence)
+    
+    # 文を区切る
+    pattern = re.compile('、|。|！|\!|\)|\?|？|♪|★|☆')
+    s = pattern.split(s1)
+
+    Tscore = {i: 0 for i in range(10)}
+    Tnum = {i: 0 for i in range(10)}
+
+    # テキスト分析
+    for line in s:
+        words = line
+        inputLine = line
+        for eachEntry in lotionDict:
+            if words.find(eachEntry[0]) != -1:
+                tempCheckArray = [int(bool(eachEntry[i])) for i in range(1, 4)]
+                flagAll = all(inputLine.find(eachEntry[i]) != -1 if tempCheckArray[i-1] else True for i in range(1, 4))
+                if flagAll:
+                    sc = float(eachEntry[4])
+                    ca = int(eachEntry[5])
+                    if 'ない' not in line or eachEntry[3]:
+                        Tscore[ca] += sc
+                        Tnum[ca] += 1
+
+    # スコアとタグを計算
+    evScoreArray = [round(Tscore[i] / Tnum[i]) if Tnum[i] != 0 else 0 for i in range(10)]
+    tagArray = ["香り", "うるおい/浸透", "美白/UV", "毛穴ケア", "爽快感", "サラサラ", "低刺激", "肌荒れ対策", "エイジングケア", "コスパ"]
+
+    # レスポンスデータの作成
+    response = {
+        "result": "ok",
+        "data": {
+            "evScore": evScoreArray,
+            "tags": [tagArray[i] if evScoreArray[i] > 3 else "" for i in range(10)]
+        }
+    }
+
+    return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
