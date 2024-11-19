@@ -35,7 +35,7 @@ def get_score():
     testSentence = request.form['rev']
 
     # 辞書ファイルの読み込み
-    with open('lotiondic0712.csv', encoding='utf-8') as f:
+    with open('./lotiondic0712.csv', encoding='utf-8') as f:
         reader = csv.reader(f)
         for row in reader:
             inputArray = [row[0], row[1], row[2], row[3], row[4], row[5]]
