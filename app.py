@@ -46,7 +46,7 @@ def login():
 
 # スコアを計算するエンドポイント（POSTリクエスト）
 @app.route('/getScorelotion', methods=['POST'])
-def get_score():
+def get_score_lotion():
     lotionDict = []
     testSentence = request.form['rev']
 
