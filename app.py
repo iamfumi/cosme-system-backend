@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template
+from flask_cors import CORS  # CORSをインポート
 from bs4 import BeautifulSoup
 import urllib.request
 import datetime
@@ -8,6 +9,7 @@ import csv
 from json import dumps
 
 app = Flask(__name__)
+CORS(app)  # CORSを適用
 
 import MeCab
 
@@ -22,7 +24,6 @@ def get_score_mecab():
     except RuntimeError as e:
         print("MeCab initialization failed:", str(e))
         return {"error": "MeCab initialization failed"}, 500
-
 
 # 静的ファイルの提供
 @app.route('/file/<path:filename>')
