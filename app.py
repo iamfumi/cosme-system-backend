@@ -123,19 +123,61 @@ def get_score():
     Tnum = {i: 0 for i in range(10)}
 
     # テキスト分析
-    for line in s:
+    # for line in s:
+    #     words = line
+    #     inputLine = line
+    #     for eachEntry in lotionDict:
+    #         if words.find(eachEntry[0]) != -1:
+    #             tempCheckArray = [int(bool(eachEntry[i])) for i in range(1, 4)]
+    #             flagAll = all(inputLine.find(eachEntry[i]) != -1 if tempCheckArray[i-1] else True for i in range(1, 4))
+    #             if flagAll:
+    #                 sc = float(eachEntry[4])
+    #                 ca = int(eachEntry[5])
+    #                 if 'ない' not in line or eachEntry[3]:
+    #                     Tscore[ca] += sc
+    #                     Tnum[ca] += 1
+    for line in s:  # s:１文のリスト
         words = line
         inputLine = line
-        for eachEntry in lotionDict:
-            if words.find(eachEntry[0]) != -1:
-                tempCheckArray = [int(bool(eachEntry[i])) for i in range(1, 4)]
-                flagAll = all(inputLine.find(eachEntry[i]) != -1 if tempCheckArray[i-1] else True for i in range(1, 4))
-                if flagAll:
-                    sc = float(eachEntry[4])
-                    ca = int(eachEntry[5])
-                    if 'ない' not in line or eachEntry[3]:
-                        Tscore[ca] += sc
-                        Tnum[ca] += 1
+
+        for eachEntry in shampooDict:  # 辞書をまわす
+            if words.find(eachEntry[0]) != -1:  # eachEntry[0](キーワード)がレビュー内に見つかったら
+                tempCheckArray = [1]
+                if eachEntry[1]:
+                    tempCheckArray.append(1)
+
+                else:
+                    tempCheckArray.append(0)
+
+                if eachEntry[2]:
+                    tempCheckArray.append(1)
+
+                else:
+                    tempCheckArray.append(0)
+
+                if eachEntry[3]:
+                    tempCheckArray.append(1)
+
+                else:
+                    tempCheckArray.append(0)
+
+                flagAll = 1
+                counter = 0
+
+                for eachCheck in tempCheckArray:
+                    if tempCheckArray[counter] == 1:
+                        if inputLine.find(eachEntry[counter]) == -1:
+                            flagAll = 0
+
+                    counter = counter + 1
+
+                if flagAll == 1:
+                    sc = float(eachEntry[4])  # 文字列のeachEntry[4](スコア)を数値に変換
+                    ca = int(eachEntry[5])    # 文字列のeachEntry[5](評価項目)を数値に変換
+
+                    if not ('ない' in line) or eachEntry[3]:
+                        Tscore[ca] = sc
+                        Tnum[ca] = 1
 
     # スコアとタグを計算
     # evScoreArray = [round(Tscore[i] / Tnum[i]) if Tnum[i] != 0 else 0 for i in range(10)]
