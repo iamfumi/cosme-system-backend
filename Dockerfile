@@ -1,6 +1,12 @@
 # ベースイメージの選択
 FROM python:3.11-slim
 
+# 必要なLinuxパッケージのインストール（MeCab関連）
+RUN apt-get update && apt-get install -y \
+    mecab \
+    libmecab-dev \
+    mecab-ipadic-utf8
+
 # 作業ディレクトリを設定
 WORKDIR /app
 
