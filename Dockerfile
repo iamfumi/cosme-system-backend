@@ -16,6 +16,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 COPY app.py app.py
 COPY lotiondic0712.csv lotiondic0712.csv
+COPY shampoodic_floral_15.csv shampoodic_floral_15.csv
 
 # Pythonパッケージのインストール
 RUN pip install --no-cache-dir -r requirements.txt
