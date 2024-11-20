@@ -9,6 +9,21 @@ from json import dumps
 
 app = Flask(__name__)
 
+import MeCab
+
+@app.route('/getScore', methods=['POST'])
+def get_score():
+    # 辞書パスを指定
+    mecab_args = '-r /etc/mecabrc -d /usr/lib/x86_64-linux-gnu/mecab/dic/ipadic'
+    try:
+        m = MeCab.Tagger(mecab_args)
+        result = m.parse("テスト")
+        return result
+    except RuntimeError as e:
+        print("MeCab initialization failed:", str(e))
+        return {"error": "MeCab initialization failed"}, 500
+
+
 # 静的ファイルの提供
 @app.route('/file/<path:filename>')
 def static_files(filename):
