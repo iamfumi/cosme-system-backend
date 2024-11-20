@@ -19,7 +19,7 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 WORKDIR /app
 
 # Flask アプリのファイルをコピー
-COPY flask_app.py /app/
+COPY app.py /app/
 
 # PHP アプリのファイルをコピー
 COPY index.php /var/www/html/
