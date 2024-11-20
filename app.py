@@ -11,8 +11,8 @@ app = Flask(__name__)
 
 import MeCab
 
-@app.route('/getScore', methods=['POST'])
-def get_score():
+@app.route('/getScoreMecab', methods=['POST'])
+def get_score_mecab():
     # 辞書パスを指定
     mecab_args = '-r /etc/mecabrc -d /usr/lib/x86_64-linux-gnu/mecab/dic/ipadic'
     try:
