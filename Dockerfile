@@ -1,30 +1,28 @@
-# ベースイメージの選択
-FROM python:3.11-slim
+# ベースイメージに Python と PHP をインストール
+FROM ubuntu:20.04
 
-# 必要なLinuxパッケージのインストール（MeCab関連）
+# 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
-    mecab \
-    libmecab-dev \
-    mecab-ipadic-utf8 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    python3-pip \
+    php \
+    apache2 \
+    libapache2-mod-php \
+    && apt-get clean
+
+# Flask インストール
+RUN pip3 install Flask
+
+# PHP の設定
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
 # 作業ディレクトリを設定
 WORKDIR /app
 
-# 必要なファイルをコピー
-COPY requirements.txt requirements.txt
-COPY app.py app.py
-COPY lotiondic0712.csv lotiondic0712.csv
+# Flask アプリのファイルをコピー
+COPY flask_app.py /app/
 
-# Pythonパッケージのインストール
-RUN pip install --no-cache-dir -r requirements.txt
+# PHP アプリのファイルをコピー
+COPY index.php /var/www/html/
 
-# MeCabの設定ファイルパスを確認（必要ならリンクを作成）
-RUN ln -s /etc/mecabrc /usr/local/etc/mecabrc
-
-# ポートを設定
-EXPOSE 10000
-
-# アプリケーションの起動コマンド
-CMD ["python", "app.py"]
+# Flask アプリを 10000 番ポートで、PHP を 80 番ポートで実行
+CMD bash -c "flask run --host=0.0.0.0 --port=10000 & apachectl -D FOREGROUND"
