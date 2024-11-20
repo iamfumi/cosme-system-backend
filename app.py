@@ -138,7 +138,8 @@ def get_score():
                         Tnum[ca] += 1
 
     # スコアとタグを計算
-    evScoreArray = [round(Tscore[i] / Tnum[i]) if Tnum[i] != 0 else 0 for i in range(10)]
+    # evScoreArray = [round(Tscore[i] / Tnum[i]) if Tnum[i] != 0 else 0 for i in range(10)]
+    evScoreArray = [(Tscore[i] / Tnum[i] if Tnum[i] != 0 else 0 for i in range(10)]
     tagArray = ["フローラル", "うるおい/浸透", "美白/UV", "毛穴ケア", "爽快感", "サラサラ", "低刺激", "肌荒れ対策", "エイジングケア", "コスパ"]
 
     # レスポンスデータの作成
