@@ -8,6 +8,9 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 COPY app.py app.py
 
+# 既存のDockerfileに次を追加
+COPY lotiondic0712.csv /app/lotiondic0712.csv
+
 # パッケージのインストール
 RUN pip install --no-cache-dir -r requirements.txt
 
