@@ -140,7 +140,7 @@ def get_score():
         words = line
         inputLine = line
 
-        for eachEntry in shampooDict:  # 辞書をまわす
+        for eachEntry in lotionDict:  # 辞書をまわす
             if words.find(eachEntry[0]) != -1:  # eachEntry[0](キーワード)がレビュー内に見つかったら
                 tempCheckArray = [1]
                 if eachEntry[1]:
