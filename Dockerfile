@@ -1,6 +1,9 @@
 # ベースイメージに Python と PHP をインストール
 FROM ubuntu:20.04
 
+# tzdata を非対話的に設定するための環境変数を設定
+ENV DEBIAN_FRONTEND=noninteractive
+
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
     python3-pip \
