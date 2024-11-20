@@ -45,7 +45,7 @@ def login():
     '''
 
 # スコアを計算するエンドポイント（POSTリクエスト）
-@app.route('/getScore', methods=['POST'])
+@app.route('/getScorelotion', methods=['POST'])
 def get_score():
     lotionDict = []
     testSentence = request.form['rev']
@@ -86,6 +86,60 @@ def get_score():
     # スコアとタグを計算
     evScoreArray = [round(Tscore[i] / Tnum[i]) if Tnum[i] != 0 else 0 for i in range(10)]
     tagArray = ["香り", "うるおい/浸透", "美白/UV", "毛穴ケア", "爽快感", "サラサラ", "低刺激", "肌荒れ対策", "エイジングケア", "コスパ"]
+
+    # レスポンスデータの作成
+    response = {
+        "result": "ok",
+        "data": {
+            "evScore": evScoreArray,
+            "tags": [tagArray[i] if evScoreArray[i] > 3 else "" for i in range(10)]
+        }
+    }
+
+    return jsonify(response)
+
+# スコアを計算するエンドポイント（POSTリクエスト）
+@app.route('/getScore', methods=['POST'])
+def get_score():
+    lotionDict = []
+    testSentence = request.form['rev']
+
+    # 辞書ファイルの読み込み
+    with open('./shampoodic_floral_15.csv', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            inputArray = [row[0], row[1], row[2], row[3], row[4], row[5]]
+            lotionDict.append(inputArray)
+
+    # MeCabを使った形態素解析
+    m = MeCab.Tagger()
+    s1 = m.parse(testSentence)
+    
+    # 文を区切る
+    pattern = re.compile('、|。|！|\!|\)|\?|？|♪|★|☆')
+    s = pattern.split(s1)
+
+    Tscore = {i: 0 for i in range(10)}
+    Tnum = {i: 0 for i in range(10)}
+
+    # テキスト分析
+    for line in s:
+        words = line
+        inputLine = line
+        for eachEntry in lotionDict:
+            if words.find(eachEntry[0]) != -1:
+                tempCheckArray = [int(bool(eachEntry[i])) for i in range(1, 4)]
+                flagAll = all(inputLine.find(eachEntry[i]) != -1 if tempCheckArray[i-1] else True for i in range(1, 4))
+                if flagAll:
+                    sc = float(eachEntry[4])
+                    ca = int(eachEntry[5])
+                    if 'ない' not in line or eachEntry[3]:
+                        Tscore[ca] += sc
+                        Tnum[ca] += 1
+
+    # スコアとタグを計算
+    evScoreArray = [round(Tscore[i] / Tnum[i]) if Tnum[i] != 0 else 0 for i in range(10)]
+    tagArray = ["フローラル", "うるおい/浸透", "美白/UV", "毛穴ケア", "爽快感", "サラサラ", "低刺激", "肌荒れ対策", "エイジングケア", "コスパ"]
 
     # レスポンスデータの作成
     response = {
