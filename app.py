@@ -101,7 +101,7 @@ def get_score_lotion():
 # スコアを計算するエンドポイント（POSTリクエスト）
 @app.route('/getScore', methods=['POST'])
 def get_score():
-    lotionDict = []
+    shampooDict = []
     testSentence = request.form['rev']
 
     # 辞書ファイルの読み込み
@@ -109,7 +109,7 @@ def get_score():
         reader = csv.reader(f)
         for row in reader:
             inputArray = [row[0], row[1], row[2], row[3], row[4], row[5]]
-            lotionDict.append(inputArray)
+            shampooDict.append(inputArray)
 
     # MeCabを使った形態素解析
     m = MeCab.Tagger()
@@ -126,7 +126,7 @@ def get_score():
     # for line in s:
     #     words = line
     #     inputLine = line
-    #     for eachEntry in lotionDict:
+    #     for eachEntry in shampooDict:
     #         if words.find(eachEntry[0]) != -1:
     #             tempCheckArray = [int(bool(eachEntry[i])) for i in range(1, 4)]
     #             flagAll = all(inputLine.find(eachEntry[i]) != -1 if tempCheckArray[i-1] else True for i in range(1, 4))
@@ -140,7 +140,7 @@ def get_score():
         words = line
         inputLine = line
 
-        for eachEntry in lotionDict:  # 辞書をまわす
+        for eachEntry in shampooDict:  # 辞書をまわす
             if words.find(eachEntry[0]) != -1:  # eachEntry[0](キーワード)がレビュー内に見つかったら
                 tempCheckArray = [1]
                 if eachEntry[1]:
@@ -181,7 +181,7 @@ def get_score():
 
     # スコアとタグを計算
     # evScoreArray = [round(Tscore[i] / Tnum[i]) if Tnum[i] != 0 else 0 for i in range(10)]
-    evScoreArray = [(Tscore[i] / 1) if Tnum[i] != 0 else 0 for i in range(10)]
+    evScoreArray = [round(Tscore[i] / 1) if Tnum[i] != 0 else 0 for i in range(10)]
     tagArray = ["フローラル", "うるおい/浸透", "美白/UV", "毛穴ケア", "爽快感", "サラサラ", "低刺激", "肌荒れ対策", "エイジングケア", "コスパ"]
 
     # レスポンスデータの作成
